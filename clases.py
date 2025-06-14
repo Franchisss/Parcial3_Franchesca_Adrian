@@ -110,75 +110,92 @@ class ArchivosDicom:
         print(f"Imagen tranformada guardada como {salida}")
 
 class ImagenSencilla: 
-    class ImagenSencilla:
-        def __init__(self, carpeta="imagenes"):
-            self.carpeta = carpeta
-            self.imagenes = {}
+    def __init__(self, carpeta="imagenes"):
+        self.carpeta = carpeta
+        self.imagenes = {}
 
-        def cargar_imagenes(self):
-            extensiones = (".png", ".jpg", ".jpeg", ".bmp")
-            for archivo in os.listdir(self.carpeta):
-                if archivo.lower().endswith(extensiones):
-                    ruta = os.path.join(self.carpeta, archivo)
-                    imagen = cv2.imread(ruta, cv2.IMREAD_GRAYSCALE)
-                    if imagen is not None:
-                        self.imagenes[archivo] = imagen
-        
-        def binarizacion(self, imagen, tipo, umbral): 
-            if tipo == 1: 
-                resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_BINARY)
-            elif tipo == 2: 
-                resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_BINARY_INV) 
-            elif tipo == 3: 
-                resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_TRUNC) 
-            elif tipo == 4: 
-                resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_TOZERO)
-            elif tipo == 5: 
-                resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_TOZERO_INV)
-            else: 
-                resultado = imagen.copy()
-            return resultado 
-        
-        def transformacion(self, imagen, tipo, tamano_kernel):
-            kernel = np.ones((tamano_kernel, tamano_kernel), np.uint8)
-            if tipo == 1:
-                transformada = cv2.erode(imagen, kernel)
-                nombre = "Erosion"
-            elif tipo == 2:
-                transformada = cv2.dilate(imagen, kernel)
-                nombre = "Dilatacion"
-            elif tipo == 3:
-                transformada = cv2.morphologyEx(imagen, cv2.MORPH_OPEN, kernel)
-                nombre = "Apertura"
-            elif tipo == 4:
-                transformada = cv2.morphologyEx(imagen, cv2.MORPH_CLOSE, kernel)
-                nombre = "Cierre"
-            elif tipo == 5:
-                transformada = cv2.morphologyEx(imagen, cv2.MORPH_GRADIENT, kernel)
-                nombre = "Gradiente"
-            elif tipo == 6:
-                transformada = cv2.morphologyEx(imagen, cv2.MORPH_TOPHAT, kernel)
-                nombre = "Top-hat"
-            elif tipo == 7:
-                transformada = cv2.morphologyEx(imagen, cv2.MORPH_BLACKHAT, kernel)
-                nombre = "Black-hat"
-            elif tipo == 8:
-                invertida = invert(imagen // 255)
-                esqueleto = skeletonize(invertida)
-                transformada = (1 - esqueleto).astype(np.uint8) * 255
-                nombre = "Esqueletizacion"
-            else:
-                transformada = imagen.copy()
-                nombre = "Sin cambio"
-            return transformada, nombre
-        
-        def dibujar(self, imagen, forma, texto):
-            if forma == "cuadrado":
-                cv2.rectangle(imagen, (10, 10), (300, 60), 255, -1)
-                cv2.putText(imagen, texto, (20, 45), cv2.FONT_HERSHEY_SIMPLEX, 0.5, 0, 1)
-            elif forma == "circulo":
-                cv2.circle(imagen, (150, 100), 50, 255, -1)
-                cv2.putText(imagen, texto, (90, 105), cv2.FONT_HERSHEY_SIMPLEX, 0.4, 0, 1)
-            return imagen
-        
-        
+    def cargar_imagenes(self):
+        extensiones = (".png", ".jpg", ".jpeg", ".bmp")
+        for archivo in os.listdir(self.carpeta):
+            if archivo.lower().endswith(extensiones):
+                ruta = os.path.join(self.carpeta, archivo)
+                imagen = cv2.imread(ruta, cv2.IMREAD_GRAYSCALE)
+                if imagen is not None:
+                    self.imagenes[archivo] = imagen
+    
+    def binarizacion(self, imagen, tipo, umbral): 
+        if tipo == 1: 
+            resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_BINARY)
+        elif tipo == 2: 
+            resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_BINARY_INV) 
+        elif tipo == 3: 
+            resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_TRUNC) 
+        elif tipo == 4: 
+            resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_TOZERO)
+        elif tipo == 5: 
+            resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_TOZERO_INV)
+        else: 
+            resultado = imagen.copy()
+        return resultado 
+    
+    def transformacion(self, imagen, tipo, tamano_kernel):
+        kernel = np.ones((tamano_kernel, tamano_kernel), np.uint8)
+        if tipo == 1:
+            transformada = cv2.erode(imagen, kernel)
+            nombre = "Erosion"
+        elif tipo == 2:
+            transformada = cv2.dilate(imagen, kernel)
+            nombre = "Dilatacion"
+        elif tipo == 3:
+            transformada = cv2.morphologyEx(imagen, cv2.MORPH_OPEN, kernel)
+            nombre = "Apertura"
+        elif tipo == 4:
+            transformada = cv2.morphologyEx(imagen, cv2.MORPH_CLOSE, kernel)
+            nombre = "Cierre"
+        elif tipo == 5:
+            transformada = cv2.morphologyEx(imagen, cv2.MORPH_GRADIENT, kernel)
+            nombre = "Gradiente"
+        elif tipo == 6:
+            transformada = cv2.morphologyEx(imagen, cv2.MORPH_TOPHAT, kernel)
+            nombre = "Top-hat"
+        elif tipo == 7:
+            transformada = cv2.morphologyEx(imagen, cv2.MORPH_BLACKHAT, kernel)
+            nombre = "Black-hat"
+        elif tipo == 8:
+            invertida = invert(imagen // 255)
+            esqueleto = skeletonize(invertida)
+            transformada = (1 - esqueleto).astype(np.uint8) * 255
+            nombre = "Esqueletizacion"
+        else:
+            transformada = imagen.copy()
+            nombre = "Sin cambio"
+        return transformada, nombre
+    
+    def dibujar(self, imagen, forma, texto):
+        if forma == "cuadrado":
+            cv2.rectangle(imagen, (10, 10), (300, 60), 255, -1)
+            cv2.putText(imagen, texto, (20, 45), cv2.FONT_HERSHEY_SIMPLEX, 0.5, 0, 1)
+        elif forma == "circulo":
+            cv2.circle(imagen, (150, 100), 50, 255, -1)
+            cv2.putText(imagen, texto, (90, 105), cv2.FONT_HERSHEY_SIMPLEX, 0.4, 0, 1)
+        return imagen
+    
+    def procesar_imagen(self, nombre, tipo_umbral, umbral_valor, tipo_transformacion, kernel, forma):
+        if nombre not in self.imagenes:
+            print("Imagen no encontrada.")
+            return None
+
+        imagen_original = self.imagenes[nombre]
+
+        imagen_binarizada = self.binarizar_imagen(imagen_original, tipo_umbral, umbral_valor)
+
+        imagen_transformada, tipo_nombre = self.aplicar_transformacion(imagen_binarizada, tipo_transformacion, kernel)
+
+        texto = f"{tipo_nombre} - kernel {kernel}"
+        imagen_final = self.dibujar_info(imagen_transformada, forma, texto)
+
+        salida = f"procesada_{nombre}"
+        cv2.imwrite(salida, imagen_final)
+
+        return salida
+
