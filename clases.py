@@ -66,5 +66,24 @@ class ArchivosDicom:
                 print("Número fuera de rango.")
         except ValueError:
             print("Entrada no válida. Debes ingresar un número.")
+    
+    def reconstruccion_3d(self):
+        if not self.dicoms:
+            print("No hay archivos DICOM cargados.")
+            return None
+
+        try:
+            self.dicoms.sort(key=lambda ds: int(ds.InstanceNumber))
+        except AttributeError:                                                          #estaparte de codigo permite saber si los cortes estan organizados para una buena reconstruccion
+            print("Algunos archivos no tienen InstanceNumber. Orden incorrecto.")
+            return None
+
+        try:
+            self.volumen = np.stack([ds.pixel_array for ds in self.dicoms])
+            print("Reconstrucción 3D completada.")
+            return self.volumen
+        except Exception as e:
+            print("Error durante la reconstrucción 3D:", str(e))
+            return None
 
 
