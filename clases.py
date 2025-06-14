@@ -14,11 +14,11 @@ class Paciente:
         self.imagen_3d = imagen
 
 class ArchivosDicom:
-    def __init__(self, carpeta = "DICOMS"):
+    def __init__(self, carpeta = "Datos"):
         self.carpeta = carpeta
         self.dicoms = []
         self.volumen = None
-        self.dataset_ejemplo = None
+
 
     def cargar_dicoms(self):
         archivos = sorted(
@@ -37,55 +37,41 @@ class ArchivosDicom:
 
         print(f"Se cargaron {len(self.dicoms)} archivos DICOM.")
 
-    def seleccionar_dataset(self):
-        if not self.dicoms:
-            print("No hay archivos DICOM cargados.")
-            return
-
-        print("Archivos disponibles:")
-        for i in range(len(self.dicoms)):
-            print(f"{i + 1}. Archivo {i + 1}")
-
-        try:
-            eleccion = int(input("Ingrese el número del archivo que desea usar como ejemplo: ")) - 1
-            if 0 <= eleccion < len(self.dicoms):
-                self.dataset = self.dicoms[eleccion]
-                print(f"Se seleccionó el archivo número {eleccion + 1}.")
-
-                # Mostrar metadatos anonimizados
-                nombre = self.dataset.get("PatientName", "No disponible")
-                edad = self.dataset.get("PatientAge", "No disponible")
-                pid = self.dataset.get("PatientID", "No disponible")
-
-                print("Metadatos extraídos:")
-                print(f"Nombre del paciente: {nombre}")
-                print(f"Edad: {edad}")
-                print(f"ID del paciente: {pid}")
-
-            else:
-                print("Número fuera de rango.")
-        except ValueError:
-            print("Entrada no válida. Debes ingresar un número.")
-    
     def reconstruccion_3d(self):
         if not self.dicoms:
             print("No hay archivos DICOM cargados.")
             return None
 
-        try:
-            self.dicoms.sort(key=lambda ds: int(ds.InstanceNumber))
-        except AttributeError:                                                          #estaparte de codigo permite saber si los cortes estan organizados para una buena reconstruccion
-            print("Algunos archivos no tienen InstanceNumber. Orden incorrecto.")
-            return None
+        print(f"\nReconstruyendo volumen 3D usando {len(self.dicoms)} archivos...")
 
         try:
-            self.volumen = np.stack([ds.pixel_array for ds in self.dicoms])
-            print("Reconstrucción 3D completada.")
-            return self.volumen
-        except Exception as e:
-            print("Error durante la reconstrucción 3D:", str(e))
+            # Ordenar por InstanceNumber si está presente
+            self.dicoms.sort(key=lambda ds: int(ds.InstanceNumber))
+        except AttributeError:
+            print("Advertencia: Algunos archivos no tienen InstanceNumber. Se usará el orden por nombre.")
+
+        # Verificar formas
+        formas = [ds.pixel_array.shape for ds in self.dicoms]
+        forma_referencia = formas[0]
+
+        imagenes_validas = []
+        for i, ds in enumerate(self.dicoms):
+            try:
+                pix = ds.pixel_array
+                if pix.shape == forma_referencia:
+                    imagenes_validas.append(pix)
+            except Exception as e:
+                print(f"Corte {i+1} omitido: {e}")
+
+        if not imagenes_validas:
+            print("No se encontraron imágenes válidas.")
             return None
-    
+
+        self.volumen = np.stack(imagenes_validas)
+        print("Reconstrucción 3D completada.")
+        print(f"Volumen: {self.volumen.shape}")
+        return self.volumen
+
     def mostrar_cortes(self):
         if self.volumen is None:
             print("No se ha reconstrudi el volumen 3D, hazlo!!.")
@@ -100,23 +86,28 @@ class ArchivosDicom:
         axs[2].set_title("Corte sagital")
         plt.show()
     
-    def obtener_info_paciente(self):
-        if self.dataset is None:
-            print("No hay archivo DICOM de referencia seleccionado.")
-            return "Anonimo", "00", "0000"
+    def transformar_imagen(self, dx, dy, salida="imagen_nueva.png"):
+        if not self.dicoms:
+            print("No hay imágenes cargadas.")
+            return
 
-        nombre = self.dataset.get((0x0010, 0x0010), "Anonimo")
-        edad = self.dataset.get((0x0010, 0x1010), "00")
-        pid = self.dataset.get((0x0010, 0x0020), "0000")
+        imagen = self.dicoms[len(self.dicoms) // 2].pixel_array
+        filas, columnas = imagen.shape
+        M = np.float32([[1, 0, dx], [0, 1, dy]])
+        trasladada = cv2.warpAffine(imagen, M, (columnas, filas))
 
-        print("Información del paciente extraída:")
-        print(f"Patient's Name: {nombre}")
-        print(f"Patient's Age: {edad}")
-        print(f"Patient ID: {pid}")
+        plt.subplot(1, 2, 1)
+        plt.imshow(imagen, cmap='gray')
+        plt.title("Original")
+        plt.subplot(1, 2, 2)
+        plt.imshow(trasladada, cmap='gray')
+        plt.title(f"Trasladada ({dx},{dy})")
+        plt.show()
 
-        return str(nombre), str(edad), str(pid)
+        cv2.imwrite(salida, trasladada)
+        print(f"Imagen tranformada guardada como {salida}")
 
-    
+
     
 
 
