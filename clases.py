@@ -171,3 +171,14 @@ class ImagenSencilla:
                 transformada = imagen.copy()
                 nombre = "Sin cambio"
             return transformada, nombre
+        
+        def dibujar(self, imagen, forma, texto):
+            if forma == "cuadrado":
+                cv2.rectangle(imagen, (10, 10), (300, 60), 255, -1)
+                cv2.putText(imagen, texto, (20, 45), cv2.FONT_HERSHEY_SIMPLEX, 0.5, 0, 1)
+            elif forma == "circulo":
+                cv2.circle(imagen, (150, 100), 50, 255, -1)
+                cv2.putText(imagen, texto, (90, 105), cv2.FONT_HERSHEY_SIMPLEX, 0.4, 0, 1)
+            return imagen
+        
+        
