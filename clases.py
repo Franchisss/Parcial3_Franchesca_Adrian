@@ -5,6 +5,8 @@ import pydicom
 import matplotlib.pyplot as plt
 import nibabel as nib
 from nilearn import plotting
+from skimage.morphology import skeletonize 
+from skimage.util import invert 
 
 class Paciente:
     def __init__(self, nombre, edad, id, imagen):
@@ -107,7 +109,18 @@ class ArchivosDicom:
         cv2.imwrite(salida, trasladada)
         print(f"Imagen tranformada guardada como {salida}")
 
+class ImagenSencilla: 
+    class ImagenSencilla:
+        def __init__(self, carpeta="imagenes"):
+            self.carpeta = carpeta
+            self.imagenes = {}
 
-    
-
-
+        def cargar_imagenes(self):
+            extensiones = (".png", ".jpg", ".jpeg", ".bmp")
+            for archivo in os.listdir(self.carpeta):
+                if archivo.lower().endswith(extensiones):
+                    ruta = os.path.join(self.carpeta, archivo)
+                    imagen = cv2.imread(ruta, cv2.IMREAD_GRAYSCALE)
+                    if imagen is not None:
+                        self.imagenes[archivo] = imagen
+        
