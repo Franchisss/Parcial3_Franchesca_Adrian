@@ -124,3 +124,17 @@ class ImagenSencilla:
                     if imagen is not None:
                         self.imagenes[archivo] = imagen
         
+        def binarizacion(self, imagen, tipo, umbral): 
+            if tipo == 1: 
+                resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_BINARY)
+            elif tipo == 2: 
+                resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_BINARY_INV) 
+            elif tipo == 3: 
+                resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_TRUNC) 
+            elif tipo == 4: 
+                resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_TOZERO)
+            elif tipo == 5: 
+                resultado = cv2.threshold(imagen, umbral, 255, cv2.THRESH_TOZERO_INV)
+            else: 
+                resultado = imagen.copy()
+            return resultado 
