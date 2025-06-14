@@ -138,3 +138,36 @@ class ImagenSencilla:
             else: 
                 resultado = imagen.copy()
             return resultado 
+        
+        def transformacion(self, imagen, tipo, tamano_kernel):
+            kernel = np.ones((tamano_kernel, tamano_kernel), np.uint8)
+            if tipo == 1:
+                transformada = cv2.erode(imagen, kernel)
+                nombre = "Erosion"
+            elif tipo == 2:
+                transformada = cv2.dilate(imagen, kernel)
+                nombre = "Dilatacion"
+            elif tipo == 3:
+                transformada = cv2.morphologyEx(imagen, cv2.MORPH_OPEN, kernel)
+                nombre = "Apertura"
+            elif tipo == 4:
+                transformada = cv2.morphologyEx(imagen, cv2.MORPH_CLOSE, kernel)
+                nombre = "Cierre"
+            elif tipo == 5:
+                transformada = cv2.morphologyEx(imagen, cv2.MORPH_GRADIENT, kernel)
+                nombre = "Gradiente"
+            elif tipo == 6:
+                transformada = cv2.morphologyEx(imagen, cv2.MORPH_TOPHAT, kernel)
+                nombre = "Top-hat"
+            elif tipo == 7:
+                transformada = cv2.morphologyEx(imagen, cv2.MORPH_BLACKHAT, kernel)
+                nombre = "Black-hat"
+            elif tipo == 8:
+                invertida = invert(imagen // 255)
+                esqueleto = skeletonize(invertida)
+                transformada = (1 - esqueleto).astype(np.uint8) * 255
+                nombre = "Esqueletizacion"
+            else:
+                transformada = imagen.copy()
+                nombre = "Sin cambio"
+            return transformada, nombre
