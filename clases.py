@@ -100,6 +100,23 @@ class ArchivosDicom:
         axs[2].set_title("Corte sagital")
         plt.show()
     
+    def obtener_info_paciente(self):
+        if self.dataset is None:
+            print("No hay archivo DICOM de referencia seleccionado.")
+            return "Anonimo", "00", "0000"
+
+        nombre = self.dataset.get((0x0010, 0x0010), "Anonimo")
+        edad = self.dataset.get((0x0010, 0x1010), "00")
+        pid = self.dataset.get((0x0010, 0x0020), "0000")
+
+        print("Información del paciente extraída:")
+        print(f"Patient's Name: {nombre}")
+        print(f"Patient's Age: {edad}")
+        print(f"Patient ID: {pid}")
+
+        return str(nombre), str(edad), str(pid)
+
+    
     
 
 
