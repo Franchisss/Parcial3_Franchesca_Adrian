@@ -85,5 +85,21 @@ class ArchivosDicom:
         except Exception as e:
             print("Error durante la reconstrucción 3D:", str(e))
             return None
+    
+    def mostrar_cortes(self):
+        if self.volumen is None:
+            print("No se ha reconstrudi el volumen 3D, hazlo!!.")
+            return
+
+        fig, axs = plt.subplots(1, 3, figsize=(15, 5))
+        axs[0].imshow(self.volumen[self.volumen.shape[0] // 2], cmap='gray')
+        axs[0].set_title("Corte axial")
+        axs[1].imshow(self.volumen[:, self.volumen.shape[1] // 2, :], cmap='gray')
+        axs[1].set_title("Corte coronal")
+        axs[2].imshow(self.volumen[:, :, self.volumen.shape[2] // 2], cmap='gray')
+        axs[2].set_title("Corte sagital")
+        plt.show()
+    
+    
 
 
