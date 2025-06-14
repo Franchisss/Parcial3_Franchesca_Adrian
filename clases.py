@@ -13,5 +13,11 @@ class Paciente:
         self.paciente_id = id
         self.imagen_3d = imagen
 
+class ArchivosDicom:
+    def __init__(self, carpeta):
+        self.carpeta = carpeta
+        self.dicoms = []
+        self.volumen = None
+        self.dataset_ejemplo = None
 
 
