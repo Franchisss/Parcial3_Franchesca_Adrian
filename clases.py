@@ -74,40 +74,65 @@ class ArchivosDicom:
         print(f"Volumen: {self.volumen.shape}")
         return self.volumen
 
-    def mostrar_cortes(self):
+    def mostrar_cortes(self, salida="cortes_volumen.png"):
         if self.volumen is None:
-            print("No se ha reconstrudi el volumen 3D, hazlo!!.")
+            print("No se ha reconstruido el volumen 3D, hazlo primero.")
             return
 
+        import matplotlib.pyplot as plt
+
         fig, axs = plt.subplots(1, 3, figsize=(15, 5))
+
         axs[0].imshow(self.volumen[self.volumen.shape[0] // 2], cmap='gray')
         axs[0].set_title("Corte axial")
+        axs[0].axis("off")
+
         axs[1].imshow(self.volumen[:, self.volumen.shape[1] // 2, :], cmap='gray')
         axs[1].set_title("Corte coronal")
+        axs[1].axis("off")
+
         axs[2].imshow(self.volumen[:, :, self.volumen.shape[2] // 2], cmap='gray')
         axs[2].set_title("Corte sagital")
+        axs[2].axis("off")
+
+        plt.tight_layout()
+        fig.savefig(salida, bbox_inches='tight')
         plt.show()
+
+        print(f"Visualización de cortes guardada como: {salida}")
+
+
     
-    def transformar_imagen(self, dx, dy, salida="imagen_nueva.png"):
+    def transformar_imagen(self, dx, dy, salida="comparacion_transformada.png"):
         if not self.dicoms:
             print("No hay imágenes cargadas.")
             return
 
         imagen = self.dicoms[len(self.dicoms) // 2].pixel_array
         filas, columnas = imagen.shape
+
+        import numpy as np
+        import matplotlib.pyplot as plt
+        import cv2
+
         M = np.float32([[1, 0, dx], [0, 1, dy]])
         trasladada = cv2.warpAffine(imagen, M, (columnas, filas))
 
-        plt.subplot(1, 2, 1)
-        plt.imshow(imagen, cmap='gray')
-        plt.title("Original")
-        plt.subplot(1, 2, 2)
-        plt.imshow(trasladada, cmap='gray')
-        plt.title(f"Trasladada ({dx},{dy})")
+        fig, axs = plt.subplots(1, 2, figsize=(10, 4))
+        axs[0].imshow(imagen, cmap='gray')
+        axs[0].set_title("Original")
+        axs[0].axis("off")
+
+        axs[1].imshow(trasladada, cmap='gray')
+        axs[1].set_title(f"Transformada ({dx},{dy})")
+        axs[1].axis("off")
+
+        plt.tight_layout()
+        fig.savefig(salida, bbox_inches='tight')
         plt.show()
 
-        cv2.imwrite(salida, trasladada)
-        print(f"Imagen tranformada guardada como {salida}")
+        print(f"Comparación guardada como: {salida}")
+
 
 class ImagenSencilla: 
     def __init__(self, carpeta="imagenes"):
