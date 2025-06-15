@@ -250,11 +250,16 @@ class ImagenSencilla:
         imagen_final = self.dibujar(imagen_transformada, forma, umbral_valor, kernel)
 
 
-        # Guardar resultado
-        salida = f"procesada_{nombre}"
-        cv2.imwrite(salida, imagen_final)
+        carpeta = "imagenes"
+        os.makedirs(carpeta, exist_ok=True)
 
-        print(f"Imagen procesada correctamente: {salida}")
-        return salida
-    
+        # Ruta final
+        nombre_salida = f"procesada_{nombre}"
+        ruta_salida = os.path.join(carpeta, nombre_salida)
+
+        # Guardar la imagen en la carpeta imagenes
+        cv2.imwrite(ruta_salida, imagen_final)
+
+        print(f"Imagen procesada guardada en: {ruta_salida}")
+        return ruta_salida
 
