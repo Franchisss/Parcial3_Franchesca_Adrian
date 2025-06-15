@@ -79,7 +79,10 @@ class ArchivosDicom:
             print("No se ha reconstruido el volumen 3D, hazlo primero.")
             return
 
-        import matplotlib.pyplot as plt
+        # Crear carpeta si no existe
+        carpeta = "imagenes"
+        os.makedirs(carpeta, exist_ok=True)
+        ruta_salida = os.path.join(carpeta, salida)
 
         fig, axs = plt.subplots(1, 3, figsize=(15, 5))
 
@@ -96,12 +99,10 @@ class ArchivosDicom:
         axs[2].axis("off")
 
         plt.tight_layout()
-        fig.savefig(salida, bbox_inches='tight')
+        fig.savefig(ruta_salida, bbox_inches='tight')
         plt.show()
 
-        print(f"Visualización de cortes guardada como: {salida}")
-
-
+        print(f"Visualización de cortes guardada como: {ruta_salida}")
     
     def transformar_imagen(self, dx, dy, salida="comparacion_transformada.png"):
         if not self.dicoms:
@@ -111,10 +112,12 @@ class ArchivosDicom:
         imagen = self.dicoms[len(self.dicoms) // 2].pixel_array
         filas, columnas = imagen.shape
 
-        import numpy as np
-        import matplotlib.pyplot as plt
-        import cv2
+        # Crear carpeta si no existe
+        carpeta = "imagenes"
+        os.makedirs(carpeta, exist_ok=True)
+        ruta_salida = os.path.join(carpeta, salida)
 
+        # Aplicar traslación
         M = np.float32([[1, 0, dx], [0, 1, dy]])
         trasladada = cv2.warpAffine(imagen, M, (columnas, filas))
 
@@ -128,11 +131,10 @@ class ArchivosDicom:
         axs[1].axis("off")
 
         plt.tight_layout()
-        fig.savefig(salida, bbox_inches='tight')
+        fig.savefig(ruta_salida, bbox_inches='tight')
         plt.show()
 
-        print(f"Comparación guardada como: {salida}")
-
+        print(f"Comparación guardada como: {ruta_salida}")
 
 class ImagenSencilla: 
     def __init__(self, carpeta="imagenes"):
